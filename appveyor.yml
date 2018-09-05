@@ -1,0 +1,32 @@
+version: 0.1.{build}
+configuration: Release
+
+image: Visual Studio 2017
+
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+clone_depth: 1  
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+
+before_build:
+  - cmd: dotnet restore
+
+build:
+  parallel: true
+  publish_nuget: true
+  verbosity: minimal
+
+before_test: 
+  - choco install rabbitmq --ignoredependencies -y 
+  - ps: (Get-Service -Name RabbitMQ).Status
+
+test:
+  assemblies: '**\*.Tests.dll'
+
+deploy: off

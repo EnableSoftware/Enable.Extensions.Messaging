@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <CodeAnalysisRuleSet>..\..\CustomExtendedCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Enable</Authors>
+    <Copyright>Copyright 2017</Copyright>
+    <Description>Messaging abstractions for building testable applications.</Description>
+    <PackageIconUrl>https://github.com/EnableSoftware.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/EnableSoftware/Enable.Extensions.Messaging/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/EnableSoftware/Enable.Extensions.Messaging</PackageProjectUrl>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="StyleCop.Analyzers" PrivateAssets="All" Version="1.0.2" />
+  </ItemGroup>
+
+</Project>
