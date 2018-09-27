@@ -84,23 +84,35 @@ namespace MessagingSamples
 
             var queueFactory = new RabbitMQMessagingClientFactory(options);
 
+            // A topic is a essentially a queue that we want to publish
+            // messages to.
             var topicName = "your-topic-name";
-            var subscriptionName = "your-subscription-name";
 
-            // Get a reference to the queue that you want to work with.
-            // The queue will be automatically created if it doesn't exist.
-            using (var queue = queueFactory.GetMessagingClient(topicName, subscriptionName))
+            // We start by getting a publisher to the topic that you want to
+            // work with. The queue will be automatically created if it doesn't
+            // exist.
+            using (var publisher = queueFactory.GetMessagePublisher(topicName))
             {
                 // Add a new item to the queue.
                 // Here we're using a `string`, but any type of message can
                 // be used as long as it can be serialised to a byte array.
-                await queue.EnqueueAsync("Hello, World!");
+                await publisher.EnqueueAsync("Hello, World!");
+            }
 
+            // Publishing messages to a topic and subscribing to messages on
+            // that topic are spearated out into different interfaces. We
+            // therefore now need to a subscriber to our topic. Each unique
+            // subscription gets a unique name. A message published to a topic
+            // will be delievered once to each unique subscription.
+            var subscriptionName = "your-subscription-name";
+            
+            using (var subscriber = queueFactory.GetMessageSubscriber(topicName, subscriptionName))
+            {
                 // Retrieve our message from the queue.
                 // We get this back as a type of `IMessage` (note that
                 // we could get `null` back here, if there are no messages
                 // in the queue).
-                var message = await queue.DequeueAsync();
+                var message = await subscriber.DequeueAsync();
 
                 // The contents of the message that we sent are available
                 // from `IMessage.Body`. This property is our original
@@ -121,12 +133,12 @@ namespace MessagingSamples
                 // We can either "complete" the message, which means that
                 // we've successfully processed it. This will remove the
                 // message from our queue.
-                await queue.CompleteAsync(message);
+                await subscriber.CompleteAsync(message);
 
                 // Or if something goes wrong and we can't process the
                 // message, we can "abandon" it (but don't call both
                 // `CompleteAsync` and `AbandonAsync`!).
-                // await queue.AbandonAsync(message);
+                // await subscriber.AbandonAsync(message);
             }
         }
     }

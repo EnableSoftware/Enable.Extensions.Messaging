@@ -2,6 +2,8 @@
 {
     public interface IMessagingClientFactory
     {
-        IMessagingClient GetMessagingClient(string topicName, string subscriptionName);
+        IMessagePublisher GetMessagePublisher(string topicName);
+
+        IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName);
     }
 }

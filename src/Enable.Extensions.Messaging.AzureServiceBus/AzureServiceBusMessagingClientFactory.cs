@@ -23,7 +23,19 @@ namespace Enable.Extensions.Messaging.AzureServiceBus
             _options = options;
         }
 
-        public IMessagingClient GetMessagingClient(string topicName, string subscriptionName)
+        public IMessagePublisher GetMessagePublisher(string topicName)
+        {
+            if (string.IsNullOrWhiteSpace(topicName))
+            {
+                throw new ArgumentException(nameof(topicName));
+            }
+
+            return new AzureServiceBusMessagePublisher(
+                _options.ConnectionString,
+                topicName);
+        }
+
+        public IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName)
         {
             if (string.IsNullOrWhiteSpace(topicName))
             {
@@ -35,7 +47,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus
                 throw new ArgumentException(nameof(subscriptionName));
             }
 
-            return new AzureServiceBusMessagingClient(
+            return new AzureServiceBusMessageSubscriber(
                 _options.ConnectionString,
                 topicName,
                 subscriptionName);

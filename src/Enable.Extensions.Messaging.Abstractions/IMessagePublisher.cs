@@ -1,0 +1,66 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Enable.Extensions.Messaging.Abstractions
+{
+    public interface IMessagePublisher : IDisposable
+    {
+        /// <summary>
+        /// Asynchronously enqueue a message on to the message bus.
+        /// </summary>
+        /// <param name="message">The message to enqueue.</param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> to observe while waiting for a task to complete.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        Task EnqueueAsync(
+            IMessage message,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Asynchronously enqueue a message on to the message bus.
+        /// </summary>
+        /// <param name="content">The payload of the message to enqueue.</param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> to observe while waiting for a task to complete.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        Task EnqueueAsync(
+            byte[] content,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Asynchronously enqueue a message on to the message bus.
+        /// </summary>
+        /// <param name="content">The payload of the message to enqueue.</param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> to observe while waiting for a task to complete.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        Task EnqueueAsync(
+            string content,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Asynchronously enqueue a message on to the message bus.
+        /// </summary>
+        /// <typeparam name="T">The type of the payload to enqueue.</typeparam>
+        /// <param name="content">The payload of the message to enqueue.</param>
+        /// <param name="cancellationToken">
+        /// A <see cref="CancellationToken"/> to observe while waiting for a task to complete.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
+        Task EnqueueAsync<T>(
+            T content,
+            CancellationToken cancellationToken = default(CancellationToken));
+    }
+}

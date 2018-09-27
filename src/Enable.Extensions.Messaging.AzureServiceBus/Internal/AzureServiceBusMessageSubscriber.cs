@@ -9,30 +9,22 @@ using MessageHandlerOptions = Enable.Extensions.Messaging.Abstractions.MessageHa
 namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
 {
     // TODO Respect cancellationToken
-    public class AzureServiceBusMessagingClient : BaseMessagingClient
+    public class AzureServiceBusMessageSubscriber : BaseMessageSubscriber
     {
-        private readonly string _connectionString;
-        private readonly string _entityPath;
         private readonly MessageReceiver _messageReceiver;
-        private readonly MessageSender _messageSender;
-
         private bool _disposed;
 
-        public AzureServiceBusMessagingClient(
+        public AzureServiceBusMessageSubscriber(
             string connectionString,
             string topicName,
             string subscriptionName)
         {
-            _connectionString = connectionString;
-
-            _entityPath = EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName);
+            var entityPath = EntityNameHelper.FormatSubscriptionPath(topicName, subscriptionName);
 
             _messageReceiver = new MessageReceiver(
-                _connectionString,
-                _entityPath,
+                connectionString,
+                entityPath,
                 ReceiveMode.PeekLock);
-
-            _messageSender = new MessageSender(_connectionString, _entityPath);
         }
 
         public override Task AbandonAsync(
@@ -63,13 +55,6 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
             }
 
             return new AzureServiceBusMessage(message);
-        }
-
-        public override Task EnqueueAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return _messageSender.SendAsync(new Message(message.Body) { ContentType = "application/json" });
         }
 
         public override Task RegisterMessageHandler(
@@ -111,10 +96,6 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
                 if (disposing)
                 {
                     _messageReceiver.CloseAsync()
-                        .GetAwaiter()
-                        .GetResult();
-
-                    _messageSender.CloseAsync()
                         .GetAwaiter()
                         .GetResult();
                 }

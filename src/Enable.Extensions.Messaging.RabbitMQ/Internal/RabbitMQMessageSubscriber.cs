@@ -9,22 +9,21 @@ using RabbitMQ.Client.Events;
 
 namespace Enable.Extensions.Messaging.RabbitMQ.Internal
 {
-    internal class RabbitMQMessagingClient : BaseMessagingClient
+    internal class RabbitMQMessageSubscriber : BaseMessageSubscriber
     {
-        private const string RedeliveryCountHeaderName = "x-redelivered-count";
-
         private readonly ConnectionFactory _connectionFactory;
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly string _exchangeName;
         private readonly string _routingKey;
         private readonly string _queueName;
+        private readonly string _deadLetterExchangeName;
         private readonly string _deadLetterQueueName;
 
         private bool _messageHandlerRegistered;
         private bool _disposed;
 
-        public RabbitMQMessagingClient(
+        public RabbitMQMessageSubscriber(
             ConnectionFactory connectionFactory,
             string topicName,
             string subscriptionName)
@@ -33,20 +32,20 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             _connection = _connectionFactory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            _exchangeName = topicName;
+            _exchangeName = GetExchangeName(topicName);
+            _deadLetterExchangeName = GetDeadLetterExchangeName(topicName);
             _routingKey = string.Empty;
-
+            
             _queueName = GetQueueName(topicName, subscriptionName);
+            _deadLetterQueueName = GetDeadLetterQueueName(topicName, subscriptionName);
 
+            // Declare the dead letter queue.
             _channel.ExchangeDeclare(
-                exchange: _exchangeName,
+                exchange: _deadLetterExchangeName,
                 type: ExchangeType.Fanout,
                 durable: true,
                 autoDelete: false,
                 arguments: null);
-
-            // Declare the dead letter queue.
-            _deadLetterQueueName = GetDeadLetterQueueName(_queueName);
 
             _channel.QueueDeclare(
                 _deadLetterQueueName,
@@ -57,13 +56,20 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
 
             _channel.QueueBind(
                 queue: _deadLetterQueueName,
-                exchange: _exchangeName,
+                exchange: _deadLetterExchangeName,
                 routingKey: _routingKey);
 
             // Declare the main queue.
+            _channel.ExchangeDeclare(
+                exchange: _exchangeName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
+
             var queueArguments = new Dictionary<string, object>
             {
-                { "x-dead-letter-exchange", _exchangeName },
+                { "x-dead-letter-exchange", _deadLetterExchangeName },
                 { "x-dead-letter-routing-key", _deadLetterQueueName }
             };
 
@@ -144,25 +150,6 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             return Task.FromResult<IMessage>(message);
         }
 
-        public override Task EnqueueAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            var body = message.Body;
-            var messageProperties = GetBasicMessageProperties(_channel);
-
-            lock (_channel)
-            {
-                _channel.BasicPublish(
-                    _exchangeName,
-                    _routingKey,
-                    messageProperties,
-                    body);
-            }
-
-            return Task.CompletedTask;
-        }
-
         public override Task RegisterMessageHandler(
             Func<IMessage, CancellationToken, Task> messageHandler,
             MessageHandlerOptions messageHandlerOptions)
@@ -238,15 +225,9 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             base.Dispose(disposing);
         }
 
-        private static IBasicProperties GetBasicMessageProperties(IModel channel)
+        private string GetExchangeName(string topicName)
         {
-            var properties = channel.CreateBasicProperties();
-
-            properties.ContentEncoding = Encoding.UTF8.HeaderName;
-            properties.ContentType = "application/json";
-            properties.Persistent = true;
-
-            return properties;
+            return topicName;
         }
 
         private string GetQueueName(string topicName, string subscriptionName)
@@ -254,8 +235,15 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             return $"{topicName}.{subscriptionName}";
         }
 
-        private string GetDeadLetterQueueName(string queueName)
+        private string GetDeadLetterExchangeName(string topicName)
         {
+            return $"{topicName}.dead-letter";
+        }
+
+        private string GetDeadLetterQueueName(string topicName, string subscriptionName)
+        {
+            var queueName = GetQueueName(topicName, subscriptionName);
+
             return $"{queueName}.dead-letter";
         }
 

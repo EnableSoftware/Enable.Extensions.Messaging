@@ -23,7 +23,17 @@ namespace Enable.Extensions.Messaging.RabbitMQ
             };
         }
 
-        public IMessagingClient GetMessagingClient(string topicName, string subscriptionName)
+        public IMessagePublisher GetMessagePublisher(string topicName)
+        {
+            if (string.IsNullOrWhiteSpace(topicName))
+            {
+                throw new ArgumentException(nameof(topicName));
+            }
+
+            return new RabbitMQMessagePublisher(_connectionFactory, topicName);
+        }
+
+        public IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName)
         {
             if (string.IsNullOrWhiteSpace(topicName))
             {
@@ -35,7 +45,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ
                 throw new ArgumentException(nameof(subscriptionName));
             }
 
-            return new RabbitMQMessagingClient(_connectionFactory, topicName, subscriptionName);
+            return new RabbitMQMessageSubscriber(_connectionFactory, topicName, subscriptionName);
         }
     }
 }

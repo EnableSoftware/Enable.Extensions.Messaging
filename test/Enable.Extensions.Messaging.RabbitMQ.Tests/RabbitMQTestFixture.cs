@@ -37,13 +37,20 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
         public string SubscriptionName { get; } = Guid.NewGuid().ToString();
 
+        private string ExchangeName => TopicName;
+
+        private string DeadLetterExchangeName => $"{TopicName}.dead-letter";
+
         private string QueueName => $"{TopicName}.{SubscriptionName}";
+
+        private string DeadLetterQueueName => $"{TopicName}.{SubscriptionName}.dead-letter";
 
         public void ClearQueue()
         {
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                channel.QueuePurge(DeadLetterQueueName);
                 channel.QueuePurge(QueueName);
             }
         }
@@ -62,8 +69,9 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
                 {
                     try
                     {
-                        // Make a best effort to remove our temporary test queue.
-                        DeleteQueue();
+                        // Make a best effort to remove our temporary test queues and exchanges.
+                        DeleteQueues();
+                        DeleteExchanges();
                     }
                     catch
                     {
@@ -74,12 +82,23 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             }
         }
 
-        private void DeleteQueue()
+        private void DeleteQueues()
         {
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                channel.QueueDelete(DeadLetterQueueName, ifUnused: false, ifEmpty: false);
                 channel.QueueDelete(QueueName, ifUnused: false, ifEmpty: false);
+            }
+        }
+
+        private void DeleteExchanges()
+        {
+            using (var connection = _connectionFactory.CreateConnection())
+            using (var channel = connection.CreateModel())
+            {
+                channel.ExchangeDelete(DeadLetterExchangeName, ifUnused: false);
+                channel.ExchangeDelete(ExchangeName, ifUnused: false);
             }
         }
     }

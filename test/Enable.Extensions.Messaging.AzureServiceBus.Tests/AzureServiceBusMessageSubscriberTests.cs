@@ -5,77 +5,35 @@ using System.Threading.Tasks;
 using Enable.Extensions.Messaging.Abstractions;
 using Xunit;
 
-namespace Enable.Extensions.Messaging.RabbitMQ.Tests
+namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
 {
-    public class RabbitMQQueueClientTests : IClassFixture<RabbitMQTestFixture>, IDisposable
+    public class AzureServiceBusMessageSubscriberTests : IClassFixture<AzureServiceBusTestFixture>, IDisposable
     {
-        private readonly RabbitMQTestFixture _fixture;
+        private readonly AzureServiceBusTestFixture _fixture;
 
-        private readonly IMessagingClient _sut;
+        private readonly IMessagePublisher _messagePublisher;
+
+        private readonly IMessageSubscriber _sut;
 
         private bool _disposed;
 
-        public RabbitMQQueueClientTests(RabbitMQTestFixture fixture)
+        public AzureServiceBusMessageSubscriberTests(AzureServiceBusTestFixture fixture)
         {
-            var options = new RabbitMQMessagingClientFactoryOptions
+            var options = new AzureServiceBusMessagingClientFactoryOptions
             {
-                HostName = fixture.HostName,
-                Port = fixture.Port,
-                VirtualHost = fixture.VirtualHost,
-                UserName = fixture.UserName,
-                Password = fixture.Password
+                ConnectionString = fixture.ConnectionString
             };
 
-            var queueFactory = new RabbitMQMessagingClientFactory(options);
+            var messagingClientFactory = new AzureServiceBusMessagingClientFactory(options);
 
-            _sut = queueFactory.GetMessagingClient(fixture.TopicName, fixture.SubscriptionName);
+            _messagePublisher = messagingClientFactory.GetMessagePublisher(
+                fixture.TopicName);
+
+            _sut = messagingClientFactory.GetMessageSubscriber(
+                fixture.TopicName,
+                fixture.SubscriptionName);
 
             _fixture = fixture;
-        }
-
-        [Fact]
-        public async Task EnqueueAsync_CanInvokeWithString()
-        {
-            // Arrange
-            var content = Guid.NewGuid().ToString();
-
-            // Act
-            await _sut.EnqueueAsync(content, CancellationToken.None);
-
-            // Clean up
-            var message = await _sut.DequeueAsync(CancellationToken.None);
-            await _sut.CompleteAsync(message, CancellationToken.None);
-        }
-
-        [Fact]
-        public async Task EnqueueAsync_CanInvokeWithByteArray()
-        {
-            // Arrange
-            var content = Encoding.UTF8.GetBytes(Guid.NewGuid().ToString());
-
-            // Act
-            await _sut.EnqueueAsync(content, CancellationToken.None);
-
-            // Clean up
-            var message = await _sut.DequeueAsync(CancellationToken.None);
-            await _sut.CompleteAsync(message, CancellationToken.None);
-        }
-
-        [Fact]
-        public async Task EnqueueAsync_CanInvokeWithCustomMessageType()
-        {
-            // Arrange
-            var content = new CustomMessageType
-            {
-                Message = Guid.NewGuid().ToString()
-            };
-
-            // Act
-            await _sut.EnqueueAsync(content, CancellationToken.None);
-
-            // Clean up
-            var message = await _sut.DequeueAsync(CancellationToken.None);
-            await _sut.CompleteAsync(message, CancellationToken.None);
         }
 
         [Fact]
@@ -94,7 +52,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             // Arrange
             var content = Guid.NewGuid().ToString();
 
-            await _sut.EnqueueAsync(content, CancellationToken.None);
+            await _messagePublisher.EnqueueAsync(content, CancellationToken.None);
 
             // Act
             var message = await _sut.DequeueAsync(CancellationToken.None);
@@ -112,7 +70,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             // Arrange
             var content = Guid.NewGuid().ToString();
 
-            await _sut.EnqueueAsync(content, CancellationToken.None);
+            await _messagePublisher.EnqueueAsync(content, CancellationToken.None);
 
             // Act
             var message = await _sut.DequeueAsync(CancellationToken.None);
@@ -128,7 +86,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
         public async Task AbandonAsync_CanInvoke()
         {
             // Arrange
-            await _sut.EnqueueAsync(
+            await _messagePublisher.EnqueueAsync(
                 Guid.NewGuid().ToString(),
                 CancellationToken.None);
 
@@ -142,7 +100,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
         public async Task CompleteAsync_CanInvoke()
         {
             // Arrange
-            await _sut.EnqueueAsync(
+            await _messagePublisher.EnqueueAsync(
                 Guid.NewGuid().ToString(),
                 CancellationToken.None);
 
@@ -161,6 +119,29 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
         }
 
         [Fact]
+        public async Task RegisterMessageHandler_MessageHandlerInvoked()
+        {
+            // Arrange
+            var evt = new ManualResetEvent(false);
+
+            Task MessageHandler(IMessage message, CancellationToken cancellationToken)
+            {
+                evt.Set();
+                return Task.CompletedTask;
+            }
+
+            await _sut.RegisterMessageHandler(MessageHandler);
+
+            // Act
+            await _messagePublisher.EnqueueAsync(
+                Guid.NewGuid().ToString(),
+                CancellationToken.None);
+
+            // Assert
+            Assert.True(evt.WaitOne(TimeSpan.FromSeconds(1)));
+        }
+
+        [Fact]
         public async Task RegisterMessageHandler_ThrowsOnMutipleMessageHandlerRegistrations()
         {
             // Arrange
@@ -176,29 +157,6 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
             // Assert
             Assert.IsType<InvalidOperationException>(exception);
-        }
-
-        [Fact]
-        public async Task RegisterMessageHandler_MessageHandlerInvoked()
-        {
-            // Arrange
-            var evt = new ManualResetEvent(false);
-
-            Task MessageHandler(IMessage message, CancellationToken cancellationToken)
-            {
-                evt.Set();
-                return Task.CompletedTask;
-            }
-
-            await _sut.RegisterMessageHandler(MessageHandler);
-
-            // Act
-            await _sut.EnqueueAsync(
-                Guid.NewGuid().ToString(),
-                CancellationToken.None);
-
-            // Assert
-            Assert.True(evt.WaitOne(TimeSpan.FromSeconds(1)));
         }
 
         [Fact]
@@ -263,7 +221,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             await _sut.RegisterMessageHandler(MessageHandler, options);
 
             // Act
-            await _sut.EnqueueAsync(
+            await _messagePublisher.EnqueueAsync(
                 Guid.NewGuid().ToString(),
                 CancellationToken.None);
 
@@ -275,17 +233,14 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
         public async Task RenewLockAsync_CanInvoke()
         {
             // Arrange
-            await _sut.EnqueueAsync(
+            await _messagePublisher.EnqueueAsync(
                 Guid.NewGuid().ToString(),
                 CancellationToken.None);
 
             var message = await _sut.DequeueAsync(CancellationToken.None);
 
             // Act
-            var exception = await Record.ExceptionAsync(() => _sut.RenewLockAsync(message, CancellationToken.None));
-
-            // Assert
-            Assert.IsType<NotImplementedException>(exception);
+            await _sut.RenewLockAsync(message, CancellationToken.None);
 
             // Clean up
             await _sut.CompleteAsync(message, CancellationToken.None);
@@ -303,15 +258,14 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             {
                 if (disposing)
                 {
-                    // With the RabbitMQ implementation, we must disconnect
-                    // our consumer before purging the queue, otherwise,
-                    // purging the queue won't remove unacked messages.
                     _sut.Dispose();
 
                     try
                     {
                         // Make a best effort to clear our test queue.
-                        _fixture.ClearQueue();
+                        _fixture.ClearQueue()
+                            .GetAwaiter()
+                            .GetResult();
                     }
                     catch
                     {
@@ -320,11 +274,6 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
                 _disposed = true;
             }
-        }
-
-        private class CustomMessageType
-        {
-            public string Message { get; set; }
         }
     }
 }

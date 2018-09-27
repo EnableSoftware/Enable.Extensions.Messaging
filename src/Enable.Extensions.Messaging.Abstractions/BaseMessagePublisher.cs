@@ -6,25 +6,8 @@ using Newtonsoft.Json;
 
 namespace Enable.Extensions.Messaging.Abstractions
 {
-    public abstract class BaseMessagingClient : IMessagingClient
+    public abstract class BaseMessagePublisher : IMessagePublisher
     {
-        public abstract Task AbandonAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken));
-
-        public abstract Task CompleteAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken));
-
-        public abstract Task<IMessage> DequeueAsync(
-            CancellationToken cancellationToken = default(CancellationToken));
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         public abstract Task EnqueueAsync(
             IMessage message,
             CancellationToken cancellationToken = default(CancellationToken));
@@ -58,21 +41,11 @@ namespace Enable.Extensions.Messaging.Abstractions
             return EnqueueAsync(message, cancellationToken);
         }
 
-        public Task RegisterMessageHandler(
-            Func<IMessage, CancellationToken, Task> messageHandler)
+        public void Dispose()
         {
-            var messageHandlerOptions = new MessageHandlerOptions();
-
-            return RegisterMessageHandler(messageHandler, messageHandlerOptions);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
-
-        public abstract Task RegisterMessageHandler(
-            Func<IMessage, CancellationToken, Task> messageHandler,
-            MessageHandlerOptions messageHandlerOptions);
-
-        public abstract Task RenewLockAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken));
 
         protected virtual void Dispose(bool disposing)
         {
