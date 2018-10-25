@@ -45,11 +45,14 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
         private string DeadLetterQueueName => $"{TopicName}.{SubscriptionName}.dead-letter";
 
+        private string DelayQueueName => $"{TopicName}.delay";
+
         public void ClearQueue()
         {
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                channel.QueuePurge(DelayQueueName);
                 channel.QueuePurge(DeadLetterQueueName);
                 channel.QueuePurge(QueueName);
             }
@@ -87,6 +90,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
             using (var connection = _connectionFactory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
+                channel.QueueDelete(DelayQueueName, ifUnused: false, ifEmpty: false);
                 channel.QueueDelete(DeadLetterQueueName, ifUnused: false, ifEmpty: false);
                 channel.QueueDelete(QueueName, ifUnused: false, ifEmpty: false);
             }

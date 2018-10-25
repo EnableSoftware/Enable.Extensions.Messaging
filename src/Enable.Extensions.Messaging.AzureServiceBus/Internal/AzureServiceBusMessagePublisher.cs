@@ -25,7 +25,17 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
             IMessage message,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return _messageSender.SendAsync(new Message(message.Body) { ContentType = "application/json" });
+            return _messageSender.SendAsync(MapMessageToAzureServiceBusMessage(message));
+        }
+
+        public override Task EnqueueAsync(
+            IMessage message,
+            DateTimeOffset scheduledTimeUtc,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return _messageSender.ScheduleMessageAsync(
+                MapMessageToAzureServiceBusMessage(message),
+                scheduledTimeUtc);
         }
 
         protected override void Dispose(bool disposing)
@@ -43,6 +53,11 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
             }
 
             base.Dispose(disposing);
+        }
+
+        private Message MapMessageToAzureServiceBusMessage(IMessage message)
+        {
+            return new Message(message.Body) { ContentType = "application/json" };
         }
     }
 }
