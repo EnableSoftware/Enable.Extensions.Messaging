@@ -78,7 +78,7 @@ namespace Enable.Extensions.Messaging.Abstractions
         {
             var batch = SerializeMessages(messages);
 
-            return EnqueueAsync(messages: batch, cancellationToken);
+            return EnqueueAsync(batch, cancellationToken);
         }
 
         public Task EnqueueAsync<T>(
