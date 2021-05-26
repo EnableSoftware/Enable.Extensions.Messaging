@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Enable.Extensions.Messaging.Abstractions;
@@ -26,6 +27,20 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return _messageSender.SendAsync(MapMessageToAzureServiceBusMessage(message));
+        }
+
+        public override Task EnqueueAsync(
+            IEnumerable<IMessage> messages,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var messageList = new List<Message>();
+
+            foreach (var message in messages)
+            {
+                messageList.Add(MapMessageToAzureServiceBusMessage(message));
+            }
+
+            return _messageSender.SendAsync(messageList);
         }
 
         public override Task EnqueueAsync(
