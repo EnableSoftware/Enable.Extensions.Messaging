@@ -31,7 +31,7 @@ namespace Enable.Extensions.Messaging.Abstractions
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        Task EnqueueAsync(
+        Task EnqueueBatchAsync(
             IEnumerable<IMessage> messages,
             CancellationToken cancellationToken = default(CancellationToken));
 
@@ -100,20 +100,6 @@ namespace Enable.Extensions.Messaging.Abstractions
             CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
-        /// Asynchronously enqueue a batch of messages on to the message bus.
-        /// </summary>
-        /// <param name="messages">The collection of payloads to enqueue.</param>
-        /// <param name="cancellationToken">
-        /// A <see cref="CancellationToken"/> to observe while waiting for a task to complete.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Task"/> representing the asynchronous operation.
-        /// </returns>
-        Task EnqueueAsync(
-            IEnumerable<string> messages,
-            CancellationToken cancellationToken = default(CancellationToken));
-
-        /// <summary>
         /// Asynchronously schedules a message on to the message bus to be published later.
         /// </summary>
         /// <param name="content">The payload of the message to enqueue.</param>
@@ -157,7 +143,7 @@ namespace Enable.Extensions.Messaging.Abstractions
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.
         /// </returns>
-        Task EnqueueAsync<T>(
+        Task EnqueueBatchAsync<T>(
             IEnumerable<T> messages,
             CancellationToken cancellationToken = default(CancellationToken));
 

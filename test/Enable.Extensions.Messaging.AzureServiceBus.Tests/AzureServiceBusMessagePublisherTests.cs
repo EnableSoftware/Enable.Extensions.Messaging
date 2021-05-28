@@ -41,7 +41,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
         }
 
         [Fact]
-        public async Task EnqueueAsync_CanInvokeWithStringCollection()
+        public async Task EnqueueBatchAsync_CanInvokeWithStringCollection()
         {
             // Arrange
             var batch = new string[]
@@ -51,7 +51,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
             };
 
             // Act
-            await _sut.EnqueueAsync<string>(batch, CancellationToken.None);
+            await _sut.EnqueueBatchAsync(batch, CancellationToken.None);
         }
 
         [Fact]
@@ -78,7 +78,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
         }
 
         [Fact]
-        public async Task EnqueueAsync_CanInvokeWithCustomMessageTypeCollection()
+        public async Task EnqueueBatchAsync_CanInvokeWithCustomMessageTypeCollection()
         {
             // Arrange
             var batch = new CustomMessageType[]
@@ -88,7 +88,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
             };
 
             // Act
-            await _sut.EnqueueAsync<CustomMessageType>(batch, CancellationToken.None);
+            await _sut.EnqueueBatchAsync(batch, CancellationToken.None);
         }
 
         public void Dispose()

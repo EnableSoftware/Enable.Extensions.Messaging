@@ -29,7 +29,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
             return _messageSender.SendAsync(MapMessageToAzureServiceBusMessage(message));
         }
 
-        public override Task EnqueueAsync(
+        public override Task EnqueueBatchAsync(
             IEnumerable<IMessage> messages,
             CancellationToken cancellationToken = default(CancellationToken))
         {

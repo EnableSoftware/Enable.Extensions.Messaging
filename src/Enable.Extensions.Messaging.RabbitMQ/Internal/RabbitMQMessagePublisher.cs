@@ -75,7 +75,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             return Task.CompletedTask;
         }
 
-        public override Task EnqueueAsync(
+        public override Task EnqueueBatchAsync(
             IEnumerable<IMessage> messages,
             CancellationToken cancellationToken = default(CancellationToken))
         {

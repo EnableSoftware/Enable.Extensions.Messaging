@@ -13,7 +13,7 @@ namespace Enable.Extensions.Messaging.Abstractions
             IMessage message,
             CancellationToken cancellationToken = default(CancellationToken));
 
-        public abstract Task EnqueueAsync(
+        public abstract Task EnqueueBatchAsync(
             IEnumerable<IMessage> messages,
             CancellationToken cancellationToken = default(CancellationToken));
 
@@ -49,13 +49,6 @@ namespace Enable.Extensions.Messaging.Abstractions
         }
 
         public Task EnqueueAsync(
-            IEnumerable<string> messages,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return EnqueueAsync<string>(messages, cancellationToken);
-        }
-
-        public Task EnqueueAsync(
             string content,
             DateTimeOffset scheduledTimeUtc,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -72,13 +65,13 @@ namespace Enable.Extensions.Messaging.Abstractions
             return EnqueueAsync(message, cancellationToken);
         }
 
-        public Task EnqueueAsync<T>(
+        public Task EnqueueBatchAsync<T>(
             IEnumerable<T> messages,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var batch = SerializeMessages(messages);
 
-            return EnqueueAsync(batch, cancellationToken);
+            return EnqueueBatchAsync(batch, cancellationToken);
         }
 
         public Task EnqueueAsync<T>(
