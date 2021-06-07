@@ -45,6 +45,20 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
         }
 
         [Fact]
+        public async Task EnqueueBatchAsync_CanInvokeWithStringCollection()
+        {
+            // Arrange
+            var batch = new string[]
+            {
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString()
+            };
+
+            // Act
+            await _sut.EnqueueBatchAsync(batch, CancellationToken.None);
+        }
+
+        [Fact]
         public async Task EnqueueAsync_CanInvokeWithByteArray()
         {
             // Arrange
@@ -65,6 +79,20 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
             // Act
             await _sut.EnqueueAsync(content, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task EnqueueBatchAsync_CanInvokeWithCustomMessageTypeCollection()
+        {
+            // Arrange
+            var batch = new CustomMessageType[]
+            {
+                new CustomMessageType { Message = Guid.NewGuid().ToString() },
+                new CustomMessageType { Message = Guid.NewGuid().ToString() }
+            };
+
+            // Act
+            await _sut.EnqueueBatchAsync(batch, CancellationToken.None);
         }
 
         public void Dispose()

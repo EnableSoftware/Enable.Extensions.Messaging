@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Enable.Extensions.Messaging.Abstractions;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace Enable.Extensions.Messaging.RabbitMQ.Internal
 {
@@ -71,6 +70,37 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                     _routingKey,
                     messageProperties,
                     body);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public override Task EnqueueBatchAsync(
+            IEnumerable<IMessage> messages,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            // Setting the mandatory option to false will silently drop a message
+            // if it fails. This is the default value for the BasicPublish method,
+            // which is used elsewhere when publishing single messages.
+            var mandatory = false;
+
+            var messageProperties = GetBasicMessageProperties(_channel);
+
+            lock (_channel)
+            {
+                var batch = _channel.CreateBasicPublishBatch();
+
+                foreach (var message in messages)
+                {
+                    batch.Add(
+                        _exchangeName,
+                        _routingKey,
+                        mandatory,
+                        messageProperties,
+                        message.Body);
+                }
+
+                batch.Publish();
             }
 
             return Task.CompletedTask;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,10 @@ namespace Enable.Extensions.Messaging.Abstractions
     {
         public abstract Task EnqueueAsync(
             IMessage message,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+        public abstract Task EnqueueBatchAsync(
+            IEnumerable<IMessage> messages,
             CancellationToken cancellationToken = default(CancellationToken));
 
         public abstract Task EnqueueAsync(
@@ -55,13 +60,18 @@ namespace Enable.Extensions.Messaging.Abstractions
             T content,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var json = JsonConvert.SerializeObject(content);
-
-            var payload = Encoding.UTF8.GetBytes(json);
-
-            IMessage message = new Message(payload);
+            var message = SerializeMessage(content);
 
             return EnqueueAsync(message, cancellationToken);
+        }
+
+        public Task EnqueueBatchAsync<T>(
+            IEnumerable<T> messages,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var batch = SerializeMessages(messages);
+
+            return EnqueueBatchAsync(batch, cancellationToken);
         }
 
         public Task EnqueueAsync<T>(
@@ -69,11 +79,7 @@ namespace Enable.Extensions.Messaging.Abstractions
             DateTimeOffset scheduledTimeUtc,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            var json = JsonConvert.SerializeObject(content);
-
-            var payload = Encoding.UTF8.GetBytes(json);
-
-            IMessage message = new Message(payload);
+            var message = SerializeMessage(content);
 
             return EnqueueAsync(message, scheduledTimeUtc, cancellationToken);
         }
@@ -86,6 +92,23 @@ namespace Enable.Extensions.Messaging.Abstractions
 
         protected virtual void Dispose(bool disposing)
         {
+        }
+
+        private IMessage SerializeMessage<T>(T content)
+        {
+            var json = JsonConvert.SerializeObject(content);
+
+            var payload = Encoding.UTF8.GetBytes(json);
+
+            return new Message(payload);
+        }
+
+        private IEnumerable<IMessage> SerializeMessages<T>(IEnumerable<T> messages)
+        {
+            foreach (var message in messages)
+            {
+                yield return SerializeMessage(message);
+            }
         }
     }
 }
