@@ -255,6 +255,9 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
                 Guid.NewGuid().ToString(),
                 CancellationToken.None);
 
+            // TODO Review the need for these delays.
+            await Task.Delay(100);
+
             var message = await _sut.DequeueAsync(CancellationToken.None);
 
             // Act
