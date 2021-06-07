@@ -23,7 +23,7 @@ build:
   verbosity: minimal
 
 before_test: 
-  - choco install rabbitmq --ignoredependencies -y 
+  - choco install rabbitmq --ignoredependencies -y --version 3.7.7
   - ps: (Get-Service -Name RabbitMQ).Status
 
 test:
