@@ -10,7 +10,7 @@
     <Copyright>Copyright 2018</Copyright>
     <Description>RabbitMQ messaging abstraction implementation for building testable applications.</Description>
     <PackageIconUrl>https://github.com/EnableSoftware.png</PackageIconUrl>
-    <PackageLicenseUrl>https://github.com/EnableSoftware/Enable.Extensions.Messaging/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/EnableSoftware/Enable.Extensions.Messaging/blob/main/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/EnableSoftware/Enable.Extensions.Messaging</PackageProjectUrl>
     <Version>0.1.0</Version>
   </PropertyGroup>
