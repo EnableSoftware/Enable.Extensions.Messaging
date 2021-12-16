@@ -1,6 +1,6 @@
 # Enable.Extensions.Messaging
 
-[![Build status](https://ci.appveyor.com/api/projects/status/tkq8x7k9gx0yowhv/branch/master?svg=true)](https://ci.appveyor.com/project/EnableSoftware/enable-extensions-messaging/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/tkq8x7k9gx0yowhv/branch/main?svg=true)](https://ci.appveyor.com/project/EnableSoftware/enable-extensions-messaging/branch/main)
 
 Messaging abstractions for building testable applications.
 
@@ -152,3 +152,4 @@ namespace MessagingSamples
 [`Enable.Extensions.Messaging.InMemory`]: https://www.nuget.org/packages/Enable.Extensions.Messaging.InMemory/
 [`Enable.Extensions.Messaging.RabbitMQ`]: https://www.nuget.org/packages/Enable.Extensions.Messaging.RabbitMQ/
 [`Enable.Extensions.Messaging.AzureServiceBus`]: https://www.nuget.org/packages/Enable.Extensions.Messaging.AzureServiceBus/
+
