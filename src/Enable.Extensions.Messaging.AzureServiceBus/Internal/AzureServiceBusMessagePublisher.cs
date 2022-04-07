@@ -72,7 +72,17 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
 
         private Message MapMessageToAzureServiceBusMessage(IMessage message)
         {
-            return new Message(message.Body) { ContentType = "application/json" };
+            var serviceBusMessage = new Message(message.Body)
+            {
+                ContentType = "application/json"
+            };
+
+            if (!string.IsNullOrEmpty(message.MessageId))
+            {
+                serviceBusMessage.MessageId = message.MessageId;
+            }
+
+            return serviceBusMessage;
         }
     }
 }
