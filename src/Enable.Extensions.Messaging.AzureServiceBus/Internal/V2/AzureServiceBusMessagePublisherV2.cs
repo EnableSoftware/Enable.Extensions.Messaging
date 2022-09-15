@@ -34,7 +34,8 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
         {
             return _serviceBusSender.ScheduleMessageAsync(
                 MapMessageToAzureServiceBusMessage(message),
-                scheduledTimeUtc);
+                scheduledTimeUtc,
+                cancellationToken);
         }
 
         public override Task EnqueueBatchAsync(
@@ -48,7 +49,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
                 messageList.Add(MapMessageToAzureServiceBusMessage(message));
             }
 
-            return _serviceBusSender.SendMessagesAsync(messageList);
+            return _serviceBusSender.SendMessagesAsync(messageList, cancellationToken);
         }
 
         protected override void Dispose(bool disposing)
