@@ -20,19 +20,26 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
             _serviceBusSender = new ServiceBusClient(connectionString).CreateSender(topicName);
         }
 
-        public override Task EnqueueAsync(IMessage message, CancellationToken cancellationToken = default)
+        public override Task EnqueueAsync(
+            IMessage message,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             return _serviceBusSender.SendMessageAsync(MapMessageToAzureServiceBusMessage(message));
         }
 
-        public override Task EnqueueAsync(IMessage message, DateTimeOffset scheduledTimeUtc, CancellationToken cancellationToken = default)
+        public override Task EnqueueAsync(
+            IMessage message,
+            DateTimeOffset scheduledTimeUtc,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             return _serviceBusSender.ScheduleMessageAsync(
                 MapMessageToAzureServiceBusMessage(message),
                 scheduledTimeUtc);
         }
 
-        public override Task EnqueueBatchAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = default)
+        public override Task EnqueueBatchAsync(
+            IEnumerable<IMessage> messages,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var messageList = new List<ServiceBusMessage>();
 

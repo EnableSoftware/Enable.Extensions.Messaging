@@ -52,7 +52,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
             }
 
             _serviceBusProcessor.ProcessMessageAsync += (processMessageEventArgs) =>
-                messageHandler(new AzureServiceBusMessageV2(processMessageEventArgs.Message), default);
+                messageHandler(new AzureServiceBusMessageV2(processMessageEventArgs.Message), default(CancellationToken));
 
             _serviceBusProcessor.ProcessErrorAsync += (processErrorEventArgs) =>
                 errorHandler(new MessageHandlerExceptionContext(processErrorEventArgs.Exception));

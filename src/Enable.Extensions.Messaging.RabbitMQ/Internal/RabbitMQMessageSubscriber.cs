@@ -35,7 +35,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             _exchangeName = GetExchangeName(topicName);
             _deadLetterExchangeName = GetDeadLetterExchangeName(topicName);
             _routingKey = string.Empty;
-            
+
             _queueName = GetQueueName(topicName, subscriptionName);
             _deadLetterQueueName = GetDeadLetterQueueName(topicName, subscriptionName);
 
