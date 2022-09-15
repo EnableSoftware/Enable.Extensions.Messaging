@@ -138,7 +138,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Tests
                 CancellationToken.None);
 
             // Assert
-            Assert.True(evt.WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(evt.WaitOne(TimeSpan.FromSeconds(3)));
         }
 
         [Fact]
