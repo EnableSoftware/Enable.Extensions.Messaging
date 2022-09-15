@@ -11,6 +11,8 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
         private readonly RabbitMQMessageSubscriber _rabbitMQMessageSubscriber;
         private readonly MessageHandlerOptions _messageHandlerOptions;
 
+        private bool _disposed;
+
         public RabbitMQMessageProcessor(
             ConnectionFactory connectionFactory,
             string topicName,
@@ -33,6 +35,21 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             _messageHandlerOptions.ExceptionReceivedHandler = errorHandler;
 
             return _rabbitMQMessageSubscriber.RegisterMessageHandler(messageHandler, _messageHandlerOptions);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _rabbitMQMessageSubscriber.Dispose();
+                }
+
+                _disposed = true;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

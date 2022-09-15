@@ -86,8 +86,6 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Tests
 
             await _sut.RegisterMessageHandler(MessageHandler);
 
-            evt.WaitOne(TimeSpan.FromSeconds(1));
-
             // Act
             await _messagePublisher.EnqueueAsync(
                 Guid.NewGuid().ToString(),
