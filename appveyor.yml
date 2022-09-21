@@ -26,7 +26,7 @@ before_test:
   - choco install rabbitmq --ignoredependencies -y --version 3.10.6
   - ps: (Get-Service -Name RabbitMQ).Status
 
-test:
-  assemblies: '**\*.Tests.dll'
+test: off
+  #assemblies: '**\*.Tests.dll'
 
 deploy: off
