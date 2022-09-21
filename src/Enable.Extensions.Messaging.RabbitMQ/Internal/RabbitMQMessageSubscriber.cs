@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Enable.Extensions.Messaging.Abstractions;
@@ -143,7 +142,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             }
 
             var message = new RabbitMQMessage(
-                result.Body,
+                result.Body.ToArray(),
                 result.DeliveryTag,
                 result.BasicProperties);
 
@@ -269,7 +268,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             var cancellationToken = CancellationToken.None;
 
             var message = new RabbitMQMessage(
-                eventArgs.Body,
+                eventArgs.Body.ToArray(),
                 eventArgs.DeliveryTag,
                 eventArgs.BasicProperties);
 
