@@ -69,7 +69,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                     _exchangeName,
                     _routingKey,
                     messageProperties,
-                    body);
+                    new ReadOnlyMemory<byte>(body));
             }
 
             return Task.CompletedTask;
@@ -97,7 +97,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                         _routingKey,
                         mandatory,
                         messageProperties,
-                        message.Body);
+                        new ReadOnlyMemory<byte>(message.Body));
                 }
 
                 batch.Publish();

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Microsoft Extended Correctness Rules (Customised)" Description="These rules expand on the basic correctness rules to maximize the logic and framework usage errors that are reported. Extra emphasis is placed on specific scenarios such as COM interop and mobile applications. Consider including this rule set if one of these scenarios applies to your project or to find additional problems in your project." ToolsVersion="14.0">
+<RuleSet Name="Microsoft Extended Correctness Rules (Customised)" Description="These rules expand on the basic correctness rules to maximize the logic and framework usage errors that are reported. Extra emphasis is placed on specific scenarios such as COM interop and mobile applications. Consider including this rule set if one of these scenarios applies to your project or to find additional problems in your project." ToolsVersion="17.0">
   <Include Path="basiccorrectnessrules.ruleset" Action="Default" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1032" Action="Warning" />
@@ -47,6 +47,7 @@
     <Rule Id="SA1133" Action="None" />
     <Rule Id="SA1200" Action="None" />
     <Rule Id="SA1309" Action="None" />
+    <Rule Id="SA1413" Action="None" />
     <Rule Id="SA1516" Action="None" />
     <Rule Id="SA1600" Action="None" />
     <Rule Id="SA1601" Action="None" />
