@@ -10,13 +10,13 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
 {
     internal class BaseRabbitMQMessagePublisher : BaseMessagePublisher
     {
-        private readonly string _routingKey;
-
         private bool _disposed;
 
         public BaseRabbitMQMessagePublisher(
             ConnectionFactory connectionFactory,
-            string topicName)
+            string topicName,
+            string exchangeType,
+            string routingKey)
         {
             ConnectionFactory = connectionFactory;
             Connection = ConnectionFactory.CreateConnection();
@@ -25,7 +25,14 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             ExchangeName = topicName;
 
             ExchangeName = GetExchangeName(topicName);
-            _routingKey = string.Empty;
+            RoutingKey = routingKey;
+
+            Channel.ExchangeDeclare(
+                exchange: ExchangeName,
+                type: exchangeType,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
 
             // Declare the delay queue. This is used to schedule messages.
             DelayQueueName = GetDelayQueueName(topicName);
@@ -33,7 +40,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             QueueArguments = new Dictionary<string, object>
             {
                 { "x-dead-letter-exchange", ExchangeName },
-                { "x-dead-letter-routing-key", _routingKey }
+                { "x-dead-letter-routing-key", RoutingKey }
             };
         }
 
@@ -57,7 +64,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             {
                 Channel.BasicPublish(
                     ExchangeName,
-                    _routingKey,
+                    RoutingKey,
                     messageProperties,
                     new ReadOnlyMemory<byte>(body));
             }
@@ -84,7 +91,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                 {
                     batch.Add(
                         ExchangeName,
-                        _routingKey,
+                        RoutingKey,
                         mandatory,
                         messageProperties,
                         new ReadOnlyMemory<byte>(message.Body));
@@ -140,15 +147,8 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             base.Dispose(disposing);
         }
 
-        protected void DeclareQueues()
+        protected void DeclareQueue()
         {
-            Channel.ExchangeDeclare(
-                exchange: ExchangeName,
-                type: ExchangeType.Fanout,
-                durable: true,
-                autoDelete: false,
-                arguments: null);
-
             Channel.QueueDeclare(
                 DelayQueueName,
                 durable: true,

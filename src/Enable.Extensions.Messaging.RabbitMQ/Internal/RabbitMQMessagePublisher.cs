@@ -7,9 +7,18 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
         public RabbitMQMessagePublisher(
             ConnectionFactory connectionFactory,
             string topicName)
-            : base(connectionFactory, topicName)
+            : this(connectionFactory, topicName, "fanout", string.Empty)
         {
-            DeclareQueues();
+        }
+
+        public RabbitMQMessagePublisher(
+            ConnectionFactory connectionFactory,
+            string topicName,
+            string exchangeType,
+            string routingKey)
+            : base(connectionFactory, topicName, exchangeType, routingKey)
+        {
+            DeclareQueue();
         }
     }
 }

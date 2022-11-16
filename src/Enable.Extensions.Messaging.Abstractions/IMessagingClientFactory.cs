@@ -1,4 +1,4 @@
-﻿namespace Enable.Extensions.Messaging.Abstractions
+namespace Enable.Extensions.Messaging.Abstractions
 {
     public interface IMessagingClientFactory
     {

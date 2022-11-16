@@ -21,6 +21,16 @@ namespace Enable.Extensions.Messaging.RabbitMQ
             return new RabbitMQMessagePublisher(ConnectionFactory, topicName);
         }
 
+        public IMessagePublisher GetMessagePublisher(string topicName, string exchangeType, string routingKey)
+        {
+            if (string.IsNullOrWhiteSpace(topicName))
+            {
+                throw new ArgumentException(nameof(topicName));
+            }
+
+            return new RabbitMQMessagePublisher(ConnectionFactory, topicName, exchangeType, routingKey);
+        }
+
         public IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName)
         {
             if (string.IsNullOrWhiteSpace(topicName))
