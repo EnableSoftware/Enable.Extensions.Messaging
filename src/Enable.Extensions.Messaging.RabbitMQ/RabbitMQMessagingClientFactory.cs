@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Enable.Extensions.Messaging.Abstractions;
 using Enable.Extensions.Messaging.RabbitMQ.Internal;
 using RabbitMQ.Client;
@@ -31,6 +31,16 @@ namespace Enable.Extensions.Messaging.RabbitMQ
             }
 
             return new RabbitMQMessagePublisher(_connectionFactory, topicName);
+        }
+
+        public IMessagePublisher GetMessagePublisher(string topicName, string exchangeType, string routingKey)
+        {
+            if (string.IsNullOrWhiteSpace(topicName))
+            {
+                throw new ArgumentException(nameof(topicName));
+            }
+
+            return new RabbitMQMessagePublisher(_connectionFactory, topicName, exchangeType, routingKey);
         }
 
         public IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName)
