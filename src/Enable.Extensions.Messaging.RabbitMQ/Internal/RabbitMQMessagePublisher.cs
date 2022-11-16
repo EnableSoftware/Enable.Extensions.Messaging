@@ -22,6 +22,15 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
         public RabbitMQMessagePublisher(
             ConnectionFactory connectionFactory,
             string topicName)
+            : this(connectionFactory, topicName, "fanout", string.Empty)
+        {
+        }
+
+        public RabbitMQMessagePublisher(
+            ConnectionFactory connectionFactory,
+            string topicName,
+            string exchangeType,
+            string routingKey)
         {
             _connectionFactory = connectionFactory;
             _connection = _connectionFactory.CreateConnection();
@@ -30,11 +39,11 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             _exchangeName = topicName;
 
             _exchangeName = GetExchangeName(topicName);
-            _routingKey = string.Empty;
+            _routingKey = routingKey;
 
             _channel.ExchangeDeclare(
                 exchange: _exchangeName,
-                type: ExchangeType.Fanout,
+                type: exchangeType,
                 durable: true,
                 autoDelete: false,
                 arguments: null);
