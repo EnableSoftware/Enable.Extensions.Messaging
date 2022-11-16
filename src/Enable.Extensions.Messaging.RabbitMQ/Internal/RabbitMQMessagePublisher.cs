@@ -22,14 +22,15 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
         public RabbitMQMessagePublisher(
             ConnectionFactory connectionFactory,
             string topicName)
-            : this(connectionFactory, topicName, "fanout")
+            : this(connectionFactory, topicName, "fanout", string.Empty)
         {
         }
 
         public RabbitMQMessagePublisher(
             ConnectionFactory connectionFactory,
             string topicName,
-            string exchangeType)
+            string exchangeType,
+            string routingKey)
         {
             _connectionFactory = connectionFactory;
             _connection = _connectionFactory.CreateConnection();
@@ -38,7 +39,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             _exchangeName = topicName;
 
             _exchangeName = GetExchangeName(topicName);
-            _routingKey = string.Empty;
+            _routingKey = routingKey;
 
             _channel.ExchangeDeclare(
                 exchange: _exchangeName,
@@ -64,9 +65,9 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                 arguments: queueArguments);
         }
 
-        public Task EnqueueAsync(
+        public override Task EnqueueAsync(
             IMessage message,
-            string routingKey)
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var body = message.Body;
             var messageProperties = GetBasicMessageProperties(_channel);
@@ -75,19 +76,12 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             {
                 _channel.BasicPublish(
                     _exchangeName,
-                    routingKey,
+                    _routingKey,
                     messageProperties,
                     new ReadOnlyMemory<byte>(body));
             }
 
             return Task.CompletedTask;
-        }
-
-        public override Task EnqueueAsync(
-            IMessage message,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return EnqueueAsync(message, _routingKey);
         }
 
         public override Task EnqueueBatchAsync(
