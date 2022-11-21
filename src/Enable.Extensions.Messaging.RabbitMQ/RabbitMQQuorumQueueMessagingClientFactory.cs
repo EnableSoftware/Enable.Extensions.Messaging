@@ -4,10 +4,10 @@ using Enable.Extensions.Messaging.RabbitMQ.Internal;
 
 namespace Enable.Extensions.Messaging.RabbitMQ
 {
-    public class RabbitMQMessagingClientFactory : BaseRabbitMQMessagingClientFactory, IMessagingClientFactory
+    public class RabbitMQQuorumQueueMessagingClientFactory : BaseRabbitMQMessagingClientFactory, IMessagingClientFactory
     {
-        public RabbitMQMessagingClientFactory(RabbitMQMessagingClientFactoryOptions options)
-            : base(options)
+        public RabbitMQQuorumQueueMessagingClientFactory(RabbitMQMessagingClientFactoryOptions options)
+             : base(options)
         {
         }
 
@@ -18,17 +18,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ
                 throw new ArgumentException(nameof(topicName));
             }
 
-            return new RabbitMQMessagePublisher(ConnectionFactory, topicName);
-        }
-
-        public IMessagePublisher GetMessagePublisher(string topicName, string exchangeType, string routingKey)
-        {
-            if (string.IsNullOrWhiteSpace(topicName))
-            {
-                throw new ArgumentException(nameof(topicName));
-            }
-
-            return new RabbitMQMessagePublisher(ConnectionFactory, topicName, exchangeType, routingKey);
+            return new RabbitMQQuorumQueueMessagePublisher(ConnectionFactory, topicName);
         }
 
         public IMessageSubscriber GetMessageSubscriber(string topicName, string subscriptionName)
@@ -43,7 +33,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ
                 throw new ArgumentException(nameof(subscriptionName));
             }
 
-            return new RabbitMQMessageSubscriber(ConnectionFactory, topicName, subscriptionName);
+            return new RabbitMQQuorumQueueMessageSubscriber(ConnectionFactory, topicName, subscriptionName);
         }
     }
 }

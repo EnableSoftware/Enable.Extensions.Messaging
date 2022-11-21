@@ -1,26 +1,14 @@
 using System;
 using Enable.Extensions.Messaging.Abstractions;
 using Enable.Extensions.Messaging.RabbitMQ.Internal;
-using RabbitMQ.Client;
 
 namespace Enable.Extensions.Messaging.RabbitMQ
 {
-    public class RabbitMQMessagingClientFactoryV2 : IMessagingClientFactoryV2
+    public class RabbitMQMessagingClientFactoryV2 : BaseRabbitMQMessagingClientFactory, IMessagingClientFactoryV2
     {
-        private readonly ConnectionFactory _connectionFactory;
-
         public RabbitMQMessagingClientFactoryV2(RabbitMQMessagingClientFactoryOptions options)
+            : base(options)
         {
-            _connectionFactory = new ConnectionFactory
-            {
-                HostName = options.HostName,
-                Port = options.Port,
-                VirtualHost = options.VirtualHost,
-                UserName = options.UserName,
-                Password = options.Password,
-                AutomaticRecoveryEnabled = true,
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(10)
-            };
         }
 
         public IMessagePublisher GetMessagePublisher(string topicName)
@@ -30,7 +18,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ
                 throw new ArgumentException(nameof(topicName));
             }
 
-            return new RabbitMQMessagePublisher(_connectionFactory, topicName);
+            return new RabbitMQMessagePublisher(ConnectionFactory, topicName);
         }
 
         public IMessageProcessor GetMessageProcessor(
@@ -53,7 +41,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ
                 throw new ArgumentNullException(nameof(messageHandlerOptions));
             }
 
-            return new RabbitMQMessageProcessor(_connectionFactory, topicName, subscriptionName, messageHandlerOptions);
+            return new RabbitMQMessageProcessor(ConnectionFactory, topicName, subscriptionName, messageHandlerOptions);
         }
     }
 }

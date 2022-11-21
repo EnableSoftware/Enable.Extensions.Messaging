@@ -82,6 +82,8 @@ namespace MessagingSamples
                 Password = "guest",
             };
 
+            // Using new RabbitMQQuorumQueueMessagingClientFactory(options) can be used to
+            // create a quorum queue if the queue does not already exist. 
             var queueFactory = new RabbitMQMessagingClientFactory(options);
 
             // A topic is a essentially a queue that we want to publish
