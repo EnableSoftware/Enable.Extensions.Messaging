@@ -30,7 +30,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
             DeadLetterQueueName = GetDeadLetterQueueName(topicName, subscriptionName);
             DLQueueArguments = null;
 
-            // Declare the dead letter queue.
+            // Declare the dead letter queue exchange.
             Channel.ExchangeDeclare(
                 exchange: DeadLetterExchangeName,
                 type: ExchangeType.Fanout,
@@ -38,7 +38,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                 autoDelete: false,
                 arguments: null);
 
-            // Declare the main queue.
+            // Declare the main queue exchange.
             Channel.ExchangeDeclare(
                 exchange: ExchangeName,
                 type: ExchangeType.Fanout,
