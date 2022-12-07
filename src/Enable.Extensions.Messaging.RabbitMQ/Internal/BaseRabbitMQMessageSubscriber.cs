@@ -206,7 +206,7 @@ namespace Enable.Extensions.Messaging.RabbitMQ.Internal
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null);
+                arguments: DLQueueArguments);
 
             Channel.QueueBind(
                 queue: DeadLetterQueueName,
