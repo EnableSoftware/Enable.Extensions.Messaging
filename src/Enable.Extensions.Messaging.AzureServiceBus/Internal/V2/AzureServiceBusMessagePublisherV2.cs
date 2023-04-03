@@ -81,6 +81,11 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
                 serviceBusMessage.MessageId = message.MessageId;
             }
 
+            if (!string.IsNullOrEmpty(message.SessionId))
+            {
+                serviceBusMessage.SessionId = message.SessionId;
+            }
+
             return serviceBusMessage;
         }
     }

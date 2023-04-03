@@ -14,6 +14,8 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal.V2
 
         public override string MessageId => _message.MessageId;
 
+        public override string SessionId => _message.SessionId;
+
         public override byte[] Body => _message.Body.ToArray();
 
         public override uint DequeueCount => (uint)_message.DeliveryCount;

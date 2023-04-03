@@ -7,6 +7,8 @@ namespace Enable.Extensions.Messaging.Abstractions
     {
         public abstract string MessageId { get; }
 
+        public abstract string SessionId { get; }
+
         public abstract string LeaseId { get; }
 
         public abstract uint DequeueCount { get; }

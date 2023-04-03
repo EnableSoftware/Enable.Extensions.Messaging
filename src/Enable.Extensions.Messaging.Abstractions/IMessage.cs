@@ -13,6 +13,12 @@ namespace Enable.Extensions.Messaging.Abstractions
         string MessageId { get; }
 
         /// <summary>
+        /// Gets the session ID.
+        /// Only supported by Azure Service Bus messaging broker.
+        /// </summary>
+        string SessionId { get; }
+
+        /// <summary>
         /// Gets a lease token for the current message.
         /// </summary>
         /// <remarks>
