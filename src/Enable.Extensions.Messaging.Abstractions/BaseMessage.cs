@@ -7,7 +7,7 @@ namespace Enable.Extensions.Messaging.Abstractions
     {
         public abstract string MessageId { get; }
 
-        public abstract string SessionId { get; }
+        public virtual string SessionId => null;
 
         public abstract string LeaseId { get; }
 
