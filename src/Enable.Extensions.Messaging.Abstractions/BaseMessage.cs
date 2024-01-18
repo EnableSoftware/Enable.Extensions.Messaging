@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -12,6 +13,8 @@ namespace Enable.Extensions.Messaging.Abstractions
         public abstract string LeaseId { get; }
 
         public abstract uint DequeueCount { get; }
+
+        public virtual DateTime EnqueuedTimeUtc { get; }
 
         public abstract byte[] Body { get; }
 

@@ -1,3 +1,4 @@
+using System;
 using Enable.Extensions.Messaging.Abstractions;
 using Microsoft.Azure.ServiceBus;
 
@@ -21,5 +22,7 @@ namespace Enable.Extensions.Messaging.AzureServiceBus.Internal
         public override uint DequeueCount => (uint)_message.SystemProperties.DeliveryCount;
 
         public override string LeaseId => _message.SystemProperties.LockToken;
+
+        public override DateTime EnqueuedTimeUtc => _message.SystemProperties.EnqueuedTimeUtc;
     }
 }
