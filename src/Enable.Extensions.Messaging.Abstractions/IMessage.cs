@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 namespace Enable.Extensions.Messaging.Abstractions
@@ -35,6 +36,12 @@ namespace Enable.Extensions.Messaging.Abstractions
         /// Gets the number of times this message has been dequeued.
         /// </summary>
         uint DequeueCount { get; }
+
+        /// <summary>
+        /// Gets the UTC time the message was enqueued at.
+        /// Only supported by Azure Service Bus messaging broker.
+        /// </summary>
+        DateTime EnqueuedTimeUtc { get; }
 
         /// <summary>
         /// Gets the content of the current message.
